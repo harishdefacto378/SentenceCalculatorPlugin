@@ -105,11 +105,8 @@
     <Compile Include="Common\Enums.cs" />
     <Compile Include="Model\MarqueeSettingEntity.cs" />
     <Compile Include="Plugins\AverageFactors\AverageFactorsPlugin.cs" />
-    <Compile Include="Plugins\DebugFactor\DebugFactorColumnsPlugin.cs" />
     <Compile Include="Plugins\Drug\DrugOperationsPlugin.cs" />
     <Compile Include="Plugins\Factor\FactorListRetrievalPlugin.cs" />
-    <Compile Include="Plugins\Factor\FactorPlugin.cs" />
-    <Compile Include="Plugins\Factor\FactorService.cs" />
     <Compile Include="Plugins\Marquee\MarqueeSettingsRetrievalPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

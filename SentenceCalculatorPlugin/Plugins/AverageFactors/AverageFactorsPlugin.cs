@@ -2,10 +2,8 @@
 using Microsoft.Xrm.Sdk.Query;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace SentenceCalculatorPlugin.Plugins.AverageFactors
 {
@@ -20,7 +18,7 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             // =========================
             // 1. Fetch Data
             // =========================
-            QueryExpression query = new QueryExpression("cr3e9_df_sentencefactor")
+            QueryExpression query = new QueryExpression("cr3e9_df_sentencefactors")
             {
                 ColumnSet = new ColumnSet(
                     "cr3e9_df_sentencecustomfactorname",
@@ -80,7 +78,7 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             // =========================
             // 5. Return JSON
             // =========================
-            context.OutputParameters["response"] = JsonConvert.SerializeObject(response);
+            context.OutputParameters["factorSummary"] = JsonConvert.SerializeObject(response);
         }
     }
 
