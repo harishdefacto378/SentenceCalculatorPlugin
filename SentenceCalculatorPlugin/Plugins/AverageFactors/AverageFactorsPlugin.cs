@@ -4,10 +4,9 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-
 namespace SentenceCalculatorPlugin.Plugins.AverageFactors
 {
-    public  class AverageFactorsPlugin : IPlugin
+    public class AverageFactorsPlugin : IPlugin
     {
         public void Execute(IServiceProvider serviceProvider)
         {
@@ -16,9 +15,9 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             var service = factory.CreateOrganizationService(context.UserId);
 
             // =========================
-            // 1. Fetch Data
+            // FETCH DATA
             // =========================
-            QueryExpression query = new QueryExpression("cr3e9_df_sentencefactors")
+            var query = new QueryExpression("cr3e9_df_sentencefactors")
             {
                 ColumnSet = new ColumnSet(
                     "cr3e9_df_sentencecustomfactorname",
@@ -30,44 +29,77 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             var result = service.RetrieveMultiple(query);
 
             // =========================
-            // 2. Aggravating / Mitigating AVG
+            // HELPERS
+            // =========================
+            int? GetType(Entity e)
+            {
+                var val = e.GetAttributeValue<object>("cr3e9_df_sentencecustomfactortype");
+
+                if (val is OptionSetValue os) return os.Value;
+                if (val is int i) return i;
+                return null;
+            }
+
+            decimal GetDecimal(Entity e, string field)
+            {
+                var val = e.GetAttributeValue<object>(field);
+
+                if (val is int i) return i;
+                if (val is decimal d) return d;
+                if (val is double db) return (decimal)db;
+
+                return 0;
+            }
+
+            string SafeString(Entity e, string field)
+            {
+                return e.GetAttributeValue<string>(field) ?? "Unknown";
+            }
+
+            // =========================
+            // AGGRAVATING
             // =========================
             var aggravating = result.Entities
-                .Where(x => x.GetAttributeValue<OptionSetValue>("cr3e9_df_sentencecustomfactortype")?.Value == 1)
-                .GroupBy(x => x.GetAttributeValue<string>("cr3e9_df_sentencecustomfactorname"))
-                .Select(g => new
+                .Where(x => GetType(x) == 1)
+                .GroupBy(x => SafeString(x, "cr3e9_df_sentencecustomfactorname"))
+                .Where(g => !string.IsNullOrWhiteSpace(g.Key))
+                .Select(g => new FactorAverageDto
                 {
                     factorName = g.Key,
-                    average = Math.Round(g.Average(x => (decimal)(x.GetAttributeValue<int?>("cr3e9_df_changeinsentence") ?? 0)), 2)
-                })
-                .ToList();
-
-            var mitigating = result.Entities
-                .Where(x => x.GetAttributeValue<OptionSetValue>("cr3e9_df_sentencecustomfactortype")?.Value == 2)
-                .GroupBy(x => x.GetAttributeValue<string>("cr3e9_df_sentencecustomfactorname"))
-                .Select(g => new
-                {
-                    factorName = g.Key,
-                    average = Math.Round(g.Average(x => (decimal)(x.GetAttributeValue<int?>("cr3e9_df_changeinsentence") ?? 0)), 2)
+                    average = Math.Round(g.Average(x => GetDecimal(x, "cr3e9_df_changeinsentence")), 2)
                 })
                 .ToList();
 
             // =========================
-            // 3. Categories from Enum
+            // MITIGATING
+            // =========================
+            var mitigating = result.Entities
+                .Where(x => GetType(x) == 2)
+                .GroupBy(x => SafeString(x, "cr3e9_df_sentencecustomfactorname"))
+                .Where(g => !string.IsNullOrWhiteSpace(g.Key))
+                .Select(g => new FactorAverageDto
+                {
+                    factorName = g.Key,
+                    average = Math.Round(g.Average(x => GetDecimal(x, "cr3e9_df_changeinsentence")), 2)
+                })
+                .ToList();
+
+            // =========================
+            // CATEGORIES ENUM
             // =========================
             var categories = Enum.GetValues(typeof(Category))
                 .Cast<Category>()
-                .Select(c => new
+                .Select(c => new CategoryDto
                 {
-                    id = (int)c - 1, // 👈 JSON me 0-based chahiye
-                name = c.ToString()
+                    id = (int)c,
+                    name = c.ToString()
                 })
                 .ToList();
 
             // =========================
-            // 4. Final Response
+            // RESPONSE MODEL
             // =========================
-            var response = new
+            var response = new FactorSummaryResponse
             {
                 totalFactorCount = result.Entities.Count,
                 categories = categories,
@@ -76,10 +108,10 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             };
 
             // =========================
-            // 5. Return JSON
+            // IMPORTANT FIX (Dataverse SAFE)
             // =========================
-            context.OutputParameters["factorSummary"] = JsonConvert.SerializeObject(response);
+            context.OutputParameters["factorSummary"] =
+                JsonConvert.SerializeObject(response);
         }
     }
-
 }
