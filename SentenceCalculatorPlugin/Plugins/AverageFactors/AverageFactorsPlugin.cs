@@ -110,8 +110,19 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             // =========================
             // IMPORTANT FIX (Dataverse SAFE)
             // =========================
-            context.OutputParameters["factorSummary"] =
-                JsonConvert.SerializeObject(response);
+            // =========================
+            // ✅ FIXED OUTPUT (Dataverse Best Practice)
+            // =========================
+
+            // Direct value
+            context.OutputParameters["totalFactorCount"] = response.totalFactorCount;
+
+            // Convert lists to JSON string
+            context.OutputParameters["categories"] = JsonConvert.SerializeObject(response.categories);
+
+            context.OutputParameters["aggravatingAverageFactors"] = JsonConvert.SerializeObject(response.aggravatingAverageFactors);
+
+            context.OutputParameters["mitigatingAverageFactors"] = JsonConvert.SerializeObject(response.mitigatingAverageFactors);
         }
     }
 }
