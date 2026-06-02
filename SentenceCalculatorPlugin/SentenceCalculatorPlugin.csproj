@@ -103,7 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Enums.cs" />
-    <Compile Include="Model\FactorSummaryResponse.cs" />
     <Compile Include="Model\MarqueeSettingEntity.cs" />
     <Compile Include="Plugins\AverageFactors\AverageFactorsPlugin.cs" />
     <Compile Include="Plugins\Drug\DrugOperationsPlugin.cs" />
