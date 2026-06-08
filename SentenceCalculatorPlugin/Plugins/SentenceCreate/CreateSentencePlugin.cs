@@ -12,50 +12,80 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
 
             try
             {
-                // INPUT SAFE READ
-                int quantity = Convert.ToInt32(context.InputParameters["df_quantitydetained"]);
-                int quantityGram = Convert.ToInt32(context.InputParameters["df_quantitydetainedingram"]);
-                int unit = Convert.ToInt32(context.InputParameters["df_unit"]);
+                // =========================
+                // SAFE INPUT (DOUBLE for Dataverse number fields)
+                // =========================
 
-                DateTime confiscationDate = (DateTime)context.InputParameters["df_confiscationdate"];
+                double quantity = context.InputParameters.Contains("df_quantitydetained")
+                    ? Convert.ToDouble(context.InputParameters["df_quantitydetained"])
+                    : 0.0;
 
-                Guid drugId = (Guid)context.InputParameters["df_drugid"];
+                double quantityGram = context.InputParameters.Contains("df_quantitydetainedingram")
+                    ? Convert.ToDouble(context.InputParameters["df_quantitydetainedingram"])
+                    : 0.0;
 
-                decimal percentage = Convert.ToDecimal(context.InputParameters["df_drugquantitypercentage"]);
-                int age = Convert.ToInt32(context.InputParameters["df_age"]);
-                int gender = Convert.ToInt32(context.InputParameters["df_gender"]);
+                double unit = context.InputParameters.Contains("df_unit")
+                    ? Convert.ToDouble(context.InputParameters["df_unit"])
+                    : 0.0;
 
-                int sentenceDays = Convert.ToInt32(context.InputParameters["df_sentencedays"]);
-                decimal fine = Convert.ToDecimal(context.InputParameters["df_fine"]);
+                DateTime confiscationDate = context.InputParameters.Contains("df_confiscationdate")
+                    ? Convert.ToDateTime(context.InputParameters["df_confiscationdate"])
+                    : DateTime.Now;
+
+                double percentage = context.InputParameters.Contains("df_drugquantitypercentage")
+                    ? Convert.ToDouble(context.InputParameters["df_drugquantitypercentage"])
+                    : 0.0;
+
+                double age = context.InputParameters.Contains("df_age")
+                    ? Convert.ToDouble(context.InputParameters["df_age"])
+                    : 0.0;
+
+                double gender = context.InputParameters.Contains("df_gender")
+                    ? Convert.ToDouble(context.InputParameters["df_gender"])
+                    : 0.0;
+
+                double sentenceDays = context.InputParameters.Contains("df_sentencedays")
+                    ? Convert.ToDouble(context.InputParameters["df_sentencedays"])
+                    : 0.0;
+
+                double fine = context.InputParameters.Contains("df_fine")
+                    ? Convert.ToDouble(context.InputParameters["df_fine"])
+                    : 0.0;
 
                 string sentenceFormat = context.InputParameters.Contains("df_sentenceyymmdd")
                     ? context.InputParameters["df_sentenceyymmdd"].ToString()
-                    : "";
+                    : string.Empty;
 
+                // =========================
                 // CREATE ENTITY
-                var entity = new Entity("df_sentences");
+                // =========================
 
-                entity["df_quantitydetained"] = quantity;
-                entity["df_quantitydetainedingram"] = quantityGram;
-                entity["df_unit"] = unit;
-                entity["df_confiscationdate"] = confiscationDate;
+                var entity = new Entity("cr3e9_df_sentences");
 
-                entity["df_drugquantitypercentage"] = percentage;
-                entity["df_age"] = age;
-                entity["df_gender"] = gender;
+                entity["cr3e9_df_quantitydetained"] = quantity;
+                entity["cr3e9_df_quantitydetainedingram"] = quantityGram;
+                entity["cr3e9_df_unit"] = unit;
+                entity["cr3e9_df_confiscationdate"] = confiscationDate;
 
-                entity["df_sentencedays"] = sentenceDays;
-                entity["df_fine"] = new Money(fine);
+                entity["cr3e9_df_drugquantitypercentage"] = percentage;
+                entity["cr3e9_df_age"] = age;
+                entity["cr3e9_df_gender"] = gender;
 
-                entity["df_sentenceyymmdd"] = sentenceFormat;
+                entity["cr3e9_df_sentencedays"] = sentenceDays;
 
-                // LOOKUP
-                entity["df_drugid"] = new EntityReference("df_drugs", drugId);
+                // ✅ FIXED: Whole Number field = int (NOT Money, NOT decimal)
+                entity["cr3e9_df_fine"] = Convert.ToInt32(Math.Round(fine));
 
+                entity["cr3e9_df_sentenceyymmdd"] = sentenceFormat;
+
+                // =========================
                 // SAVE
+                // =========================
                 Guid recordId = service.Create(entity);
 
+                // =========================
                 // OUTPUT
+                // =========================
                 context.OutputParameters["message"] = "Record created successfully.";
                 context.OutputParameters["id"] = recordId;
             }
