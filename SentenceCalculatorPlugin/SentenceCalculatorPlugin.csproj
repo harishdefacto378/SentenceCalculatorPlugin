@@ -109,6 +109,7 @@
     <Compile Include="Plugins\Drug\DrugOperationsPlugin.cs" />
     <Compile Include="Plugins\Factor\FactorListRetrievalPlugin.cs" />
     <Compile Include="Plugins\Marquee\MarqueeSettingsRetrievalPlugin.cs" />
+    <Compile Include="Plugins\SentenceCreate\CreateSentencePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
