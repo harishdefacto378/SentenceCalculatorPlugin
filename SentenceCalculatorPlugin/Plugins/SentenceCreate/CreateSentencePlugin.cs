@@ -4,6 +4,28 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
 {
     public class CreateSentencePlugin : IPlugin
     {
+        private double SafeDouble(object value)
+        {
+            if (value == null) return 0.0;
+
+            try
+            {
+                return Convert.ToDouble(value);
+            }
+            catch
+            {
+                return 0.0;
+            }
+        }
+
+        private DateTime SafeDate(object value)
+        {
+            if (value == null) return DateTime.Now;
+
+            DateTime dt;
+            return DateTime.TryParse(value.ToString(), out dt) ? dt : DateTime.Now;
+        }
+
         public void Execute(IServiceProvider serviceProvider)
         {
             var context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
@@ -13,47 +35,24 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
             try
             {
                 // =========================
-                // SAFE INPUT (DOUBLE for Dataverse number fields)
+                // SAFE INPUT
                 // =========================
 
-                double quantity = context.InputParameters.Contains("df_quantitydetained")
-                    ? Convert.ToDouble(context.InputParameters["df_quantitydetained"])
-                    : 0.0;
+                double quantity = SafeDouble(context.InputParameters["df_quantitydetained"]);
+                double quantityGram = SafeDouble(context.InputParameters["df_quantitydetainedingram"]);
+                double unit = SafeDouble(context.InputParameters["df_unit"]);
 
-                double quantityGram = context.InputParameters.Contains("df_quantitydetainedingram")
-                    ? Convert.ToDouble(context.InputParameters["df_quantitydetainedingram"])
-                    : 0.0;
+                DateTime confiscationDate = SafeDate(context.InputParameters["df_confiscationdate"]);
 
-                double unit = context.InputParameters.Contains("df_unit")
-                    ? Convert.ToDouble(context.InputParameters["df_unit"])
-                    : 0.0;
+                double percentage = SafeDouble(context.InputParameters["df_drugquantitypercentage"]);
+                double age = SafeDouble(context.InputParameters["df_age"]);
+                double gender = SafeDouble(context.InputParameters["df_gender"]);
+                double sentenceDays = SafeDouble(context.InputParameters["df_sentencedays"]);
+                double fine = SafeDouble(context.InputParameters["df_fine"]);
 
-                DateTime confiscationDate = context.InputParameters.Contains("df_confiscationdate")
-                    ? Convert.ToDateTime(context.InputParameters["df_confiscationdate"])
-                    : DateTime.Now;
-
-                double percentage = context.InputParameters.Contains("df_drugquantitypercentage")
-                    ? Convert.ToDouble(context.InputParameters["df_drugquantitypercentage"])
-                    : 0.0;
-
-                double age = context.InputParameters.Contains("df_age")
-                    ? Convert.ToDouble(context.InputParameters["df_age"])
-                    : 0.0;
-
-                double gender = context.InputParameters.Contains("df_gender")
-                    ? Convert.ToDouble(context.InputParameters["df_gender"])
-                    : 0.0;
-
-                double sentenceDays = context.InputParameters.Contains("df_sentencedays")
-                    ? Convert.ToDouble(context.InputParameters["df_sentencedays"])
-                    : 0.0;
-
-                double fine = context.InputParameters.Contains("df_fine")
-                    ? Convert.ToDouble(context.InputParameters["df_fine"])
-                    : 0.0;
-
+                // ✅ FIXED STRING FIELD
                 string sentenceFormat = context.InputParameters.Contains("df_sentenceyymmdd")
-                    ? context.InputParameters["df_sentenceyymmdd"].ToString()
+                    ? Convert.ToString(context.InputParameters["df_sentenceyymmdd"])
                     : string.Empty;
 
                 // =========================
@@ -73,7 +72,7 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
 
                 entity["cr3e9_df_sentencedays"] = sentenceDays;
 
-                // ✅ FIXED: Whole Number field = int (NOT Money, NOT decimal)
+                // fine (adjust based on Dataverse field type)
                 entity["cr3e9_df_fine"] = Convert.ToInt32(Math.Round(fine));
 
                 entity["cr3e9_df_sentenceyymmdd"] = sentenceFormat;
@@ -91,7 +90,9 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
             }
             catch (Exception ex)
             {
-                throw new InvalidPluginExecutionException("CreateSentencePlugin failed: " + ex.Message);
+                throw new InvalidPluginExecutionException(
+                    "CreateSentencePlugin failed: " + ex.Message
+                );
             }
         }
     }
