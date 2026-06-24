@@ -17,12 +17,12 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             // =========================
             // FETCH DATA
             // =========================
-            var query = new QueryExpression("cr3e9_df_sentencefactors")
+            var query = new QueryExpression("cr3e9_df_factors")
             {
                 ColumnSet = new ColumnSet(
-                    "cr3e9_df_sentencecustomfactorname",
-                    "cr3e9_df_changeinsentence",
-                    "cr3e9_df_sentencecustomfactortype"
+                    "cr3e9_df_factorname",
+                    "cr3e9_df_sequencenumber",
+                    "cr3e9_df_factortype"
                 )
             };
 
@@ -33,7 +33,7 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             // =========================
             int? GetType(Entity e)
             {
-                var val = e.GetAttributeValue<object>("cr3e9_df_sentencecustomfactortype");
+                var val = e.GetAttributeValue<object>("cr3e9_df_factortype");
 
                 if (val is OptionSetValue os) return os.Value;
                 if (val is int i) return i;
@@ -61,12 +61,12 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             // =========================
             var aggravating = result.Entities
                 .Where(x => GetType(x) == 1)
-                .GroupBy(x => SafeString(x, "cr3e9_df_sentencecustomfactorname"))
+                .GroupBy(x => SafeString(x, "cr3e9_df_factorname"))
                 .Where(g => !string.IsNullOrWhiteSpace(g.Key))
                 .Select(g => new FactorAverageDto
                 {
                     factorName = g.Key,
-                    average = Math.Round(g.Average(x => GetDecimal(x, "cr3e9_df_changeinsentence")), 2)
+                    average = Math.Round(g.Average(x => GetDecimal(x, "cr3e9_df_sequencenumber")), 2)
                 })
                 .ToList();
 
@@ -75,12 +75,12 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             // =========================
             var mitigating = result.Entities
                 .Where(x => GetType(x) == 2)
-                .GroupBy(x => SafeString(x, "cr3e9_df_sentencecustomfactorname"))
+                .GroupBy(x => SafeString(x, "cr3e9_df_factorname"))
                 .Where(g => !string.IsNullOrWhiteSpace(g.Key))
                 .Select(g => new FactorAverageDto
                 {
                     factorName = g.Key,
-                    average = Math.Round(g.Average(x => GetDecimal(x, "cr3e9_df_changeinsentence")), 2)
+                    average = Math.Round(g.Average(x => GetDecimal(x, "cr3e9_df_sequencenumber")), 2)
                 })
                 .ToList();
 
