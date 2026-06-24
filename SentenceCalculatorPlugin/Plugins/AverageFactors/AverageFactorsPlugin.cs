@@ -26,6 +26,7 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
                 )
             };
 
+
             var result = service.RetrieveMultiple(query);
 
             // =========================
