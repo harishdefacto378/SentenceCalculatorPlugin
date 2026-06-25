@@ -29,7 +29,7 @@ namespace SentenceCalculatorPlugin.Plugins.Drug
             try
             {
                 // Step 1: Query data from Dataverse table
-                QueryExpression query = new QueryExpression("cr3e9_df_drugs")
+                QueryExpression query = new QueryExpression("df_drug")
                 {
                     ColumnSet = new ColumnSet(true)
                 };
@@ -39,10 +39,10 @@ namespace SentenceCalculatorPlugin.Plugins.Drug
                 tracing.Trace($"Records fetched: {drugList.Entities.Count}");
 
                 // IMPORTANT: Ensure EntityName is set
-                drugList.EntityName = "cr3e9_df_drugs";
+                drugList.EntityName = "df_drug";
 
                 // Step 2: Set Custom API response parameter (FIXED)
-                context.OutputParameters["df_drugs"] = drugList;
+                context.OutputParameters["df_drug"] = drugList;
 
                 tracing.Trace("Output parameter 'df_drugs' set successfully");
                 tracing.Trace("GetDrugList Plugin Completed Successfully");
