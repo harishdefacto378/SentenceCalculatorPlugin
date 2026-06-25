@@ -24,10 +24,10 @@ namespace SentenceCalculatorPlugin.Plugins.Factor
 
             try
             {
-                string entityName = "cr3e9_df_factors";
+                string entityName = "df_factor";
 
                 // Step 1: Query data from Dataverse table
-                QueryExpression query = new QueryExpression("cr3e9_df_factors")
+                QueryExpression query = new QueryExpression("df_factor")
                 {
                     ColumnSet = new ColumnSet(true)
                 };

@@ -42,7 +42,7 @@ namespace SentenceCalculatorPlugin.Plugins.Drug
                 drugList.EntityName = "df_drug";
 
                 // Step 2: Set Custom API response parameter (FIXED)
-                context.OutputParameters["df_drug"] = drugList;
+                context.OutputParameters["df_drugs"] = drugList;
 
                 tracing.Trace("Output parameter 'df_drugs' set successfully");
                 tracing.Trace("GetDrugList Plugin Completed Successfully");

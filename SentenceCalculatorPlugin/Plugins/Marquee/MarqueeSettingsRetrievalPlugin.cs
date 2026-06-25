@@ -27,15 +27,15 @@ namespace SentenceCalculatorPlugin.Plugins.Marquee
                 tracing.Trace("MarqueeSettingsRetrievalPlugin execution started.");
 
                 // TODO: Replace with your actual table logical name
-                string entityName = "cr3e9_df_settings";
+                string entityName = "df_setting";
 
                 QueryExpression query = new QueryExpression(entityName)
                 {
                     ColumnSet = new ColumnSet(
-                     "cr3e9_df_marqueelink",
-                     "cr3e9_df_marqueelinktext",
-                     "cr3e9_df_marqueetext",
-                     "cr3e9_df_marqueevisible"),
+                     "df_marqueelink",
+                     "df_marqueelinktext",
+                     "df_marqueetext",
+                     "df_marqueevisible"),
                     TopCount = 1
                 };
 
@@ -54,13 +54,13 @@ namespace SentenceCalculatorPlugin.Plugins.Marquee
 
                 Entity output = new Entity();
 
-                string link =marqueeRecord.GetAttributeValue<string>("cr3e9_df_marqueelink") ?? string.Empty;
+                string link =marqueeRecord.GetAttributeValue<string>("df_marqueelink") ?? string.Empty;
 
-                string linkText =marqueeRecord.GetAttributeValue<string>("cr3e9_df_marqueelinktext") ?? string.Empty;
+                string linkText =marqueeRecord.GetAttributeValue<string>("df_marqueelinktext") ?? string.Empty;
 
-                string text =marqueeRecord.GetAttributeValue<string>("cr3e9_df_marqueetext") ?? string.Empty;
+                string text =marqueeRecord.GetAttributeValue<string>("df_marqueetext") ?? string.Empty;
 
-                bool visible =marqueeRecord.GetAttributeValue<bool?>("cr3e9_df_marqueevisible") ?? false;
+                bool visible =marqueeRecord.GetAttributeValue<bool?>("df_marqueevisible") ?? false;
 
                 // assign output
                 output["marqueelink"] = link;

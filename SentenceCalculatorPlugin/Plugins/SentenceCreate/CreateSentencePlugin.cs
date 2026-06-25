@@ -59,23 +59,23 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
                 // CREATE ENTITY
                 // =========================
 
-                var entity = new Entity("cr3e9_df_sentences");
+                var entity = new Entity("df_sentence");
 
-                entity["cr3e9_df_quantitydetained"] = quantity;
-                entity["cr3e9_df_quantitydetainedingram"] = quantityGram;
-                entity["cr3e9_df_unit"] = unit;
-                entity["cr3e9_df_confiscationdate"] = confiscationDate;
+                entity["df_quantitydetained"] = quantity;
+                entity["df_quantitydetainedingram"] = quantityGram;
+                entity["df_unit"] = unit;
+                entity["df_confiscationdate"] = confiscationDate;
 
-                entity["cr3e9_df_drugquantitypercentage"] = percentage;
-                entity["cr3e9_df_age"] = age;
-                entity["cr3e9_df_gender"] = gender;
+                entity["df_drugquantitypercentage"] = percentage;
+                entity["df_age"] = age;
+                entity["df_gender"] = gender;
 
-                entity["cr3e9_df_sentencedays"] = sentenceDays;
+                entity["df_sentencedays"] = sentenceDays;
 
                 // fine (adjust based on Dataverse field type)
-                entity["cr3e9_df_fine"] = Convert.ToInt32(Math.Round(fine));
+                entity["df_fine"] = Convert.ToInt32(Math.Round(fine));
 
-                entity["cr3e9_df_sentenceyymmdd"] = sentenceFormat;
+                entity["df_sentenceyymmdd"] = sentenceFormat;
 
                 // =========================
                 // SAVE
