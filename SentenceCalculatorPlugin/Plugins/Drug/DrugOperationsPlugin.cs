@@ -28,20 +28,45 @@ namespace SentenceCalculatorPlugin.Plugins.Drug
 
             try
             {
-                // Step 1: Query data from Dataverse table
+                // ✅ Step 1: Query only required columns (FIXED)
                 QueryExpression query = new QueryExpression("df_drug")
                 {
-                    ColumnSet = new ColumnSet(true)
+                    ColumnSet = new ColumnSet(
+                        "df_drugidentifier",
+                        "df_drugtype",
+                        "df_smallquantitygram",
+                        "df_commercialquantitygram",
+                       // "df_commercialmaxquantitygram",
+                        "df_smallminsent",
+                        "df_smallmaxsent",
+                        "df_interminsent",
+                        "df_intermaxsent",
+                        "df_commminsent",
+                        "df_commmaxsent",
+                        "df_smallminfine",
+                        "df_smallmaxfine",
+                        "df_interminfine",
+                        "df_intermaxfine",
+                        "df_commminfine",
+                        "df_commmaxfine",
+                        "df_punishableundersectionsmall",
+                        "df_punishableundersectionintermediate",
+                        "df_punishableundersectioncommercial",
+                        "df_notificationno_under_viia_xxiiia_of_s2",
+                        "df_notificationdate_under_viia_xxiiia_of_s2",
+                        "df_notificationreportanddate",
+                        "df_chemicalname_defined_in_s2xxiii"
+                    )
                 };
 
                 EntityCollection drugList = service.RetrieveMultiple(query);
 
                 tracing.Trace($"Records fetched: {drugList.Entities.Count}");
 
-                // IMPORTANT: Ensure EntityName is set
+                // ✅ Ensure EntityName is set
                 drugList.EntityName = "df_drug";
 
-                // Step 2: Set Custom API response parameter (FIXED)
+                // ✅ Step 2: Set Custom API response
                 context.OutputParameters["df_drugs"] = drugList;
 
                 tracing.Trace("Output parameter 'df_drugs' set successfully");
