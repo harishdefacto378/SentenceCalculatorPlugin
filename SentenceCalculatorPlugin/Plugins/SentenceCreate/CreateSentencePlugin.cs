@@ -4,18 +4,26 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
 {
     public class CreateSentencePlugin : IPlugin
     {
-        private double SafeDouble(object value)
+        // ✅ Handles int, double, decimal, string
+        private decimal SafeDecimal(object value)
         {
-            if (value == null) return 0.0;
+            if (value == null) return 0;
+            try { return Convert.ToDecimal(value); }
+            catch { return 0; }
+        }
 
-            try
-            {
-                return Convert.ToDouble(value);
-            }
-            catch
-            {
-                return 0.0;
-            }
+        private int SafeInt(object value)
+        {
+            if (value == null) return 0;
+            try { return Convert.ToInt32(value); }
+            catch { return 0; }
+        }
+
+        private OptionSetValue SafeOptionSet(object value)
+        {
+            if (value == null) return null;
+            try { return new OptionSetValue(Convert.ToInt32(value)); }
+            catch { return null; }
         }
 
         private DateTime SafeDate(object value)
@@ -38,19 +46,21 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
                 // SAFE INPUT
                 // =========================
 
-                double quantity = SafeDouble(context.InputParameters["df_quantitydetained"]);
-                double quantityGram = SafeDouble(context.InputParameters["df_quantitydetainedingram"]);
-                double unit = SafeDouble(context.InputParameters["df_unit"]);
+                decimal quantity = SafeDecimal(context.InputParameters["df_quantitydetained"]);
+                decimal quantityGram = SafeDecimal(context.InputParameters["df_quantitydetainedingram"]);
+                decimal percentage = SafeDecimal(context.InputParameters["df_drugquantitypercentage"]);
+
+                int age = SafeInt(context.InputParameters["df_age"]);
+
+                OptionSetValue unit = SafeOptionSet(context.InputParameters["df_unit"]);
+                OptionSetValue quantityType = SafeOptionSet(context.InputParameters["df_quantitytype"]);
+                OptionSetValue gender = SafeOptionSet(context.InputParameters["df_gender"]);
 
                 DateTime confiscationDate = SafeDate(context.InputParameters["df_confiscationdate"]);
 
-                double percentage = SafeDouble(context.InputParameters["df_drugquantitypercentage"]);
-                double age = SafeDouble(context.InputParameters["df_age"]);
-                double gender = SafeDouble(context.InputParameters["df_gender"]);
-                double sentenceDays = SafeDouble(context.InputParameters["df_sentencedays"]);
-                double fine = SafeDouble(context.InputParameters["df_fine"]);
+                int sentenceDays = SafeInt(context.InputParameters["df_sentencedays"]);
+                decimal fine = SafeDecimal(context.InputParameters["df_fine"]);
 
-                // ✅ FIXED STRING FIELD
                 string sentenceFormat = context.InputParameters.Contains("df_sentenceyymmdd")
                     ? Convert.ToString(context.InputParameters["df_sentenceyymmdd"])
                     : string.Empty;
@@ -61,30 +71,33 @@ namespace SentenceCalculatorPlugin.Plugins.SentenceCreate
 
                 var entity = new Entity("df_sentence");
 
+                // ✅ Decimal fields
                 entity["df_quantitydetained"] = quantity;
                 entity["df_quantitydetainedingram"] = quantityGram;
-                entity["df_unit"] = unit;
-                entity["df_confiscationdate"] = confiscationDate;
-
                 entity["df_drugquantitypercentage"] = percentage;
+
+                // ✅ Whole number
                 entity["df_age"] = age;
+                entity["df_sentencedays"] = sentenceDays;
+                entity["df_fine"] = fine;
+
+                // ✅ Choice fields
+                entity["df_unit"] = unit;
+                entity["df_quantitytype"] = quantityType;
                 entity["df_gender"] = gender;
 
-                entity["df_sentencedays"] = sentenceDays;
+                // ✅ Date
+                entity["df_confiscationdate"] = confiscationDate;
 
-                // fine (adjust based on Dataverse field type)
-                entity["df_fine"] = Convert.ToInt32(Math.Round(fine));
-
+                // ✅ Text
                 entity["df_sentenceyymmdd"] = sentenceFormat;
 
                 // =========================
                 // SAVE
                 // =========================
+
                 Guid recordId = service.Create(entity);
 
-                // =========================
-                // OUTPUT
-                // =========================
                 context.OutputParameters["message"] = "Record created successfully.";
                 context.OutputParameters["id"] = recordId;
             }
