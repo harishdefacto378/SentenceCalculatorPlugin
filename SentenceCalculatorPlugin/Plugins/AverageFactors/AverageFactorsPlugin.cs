@@ -20,7 +20,7 @@ namespace SentenceCalculatorPlugin.Plugins.AverageFactors
             var query = new QueryExpression("df_factor")
             {
                 ColumnSet = new ColumnSet(
-                    "df_factorname",
+                    "df_FactorPrimaryId",
                     "df_sequencenumber",
                     "df_factortype"
                 )
